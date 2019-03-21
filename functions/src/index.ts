@@ -6,8 +6,12 @@ export const emailSubscribe = functions.https.onCall(async (
     email: string;
   }
 ) => {
+  if (!data.email) {
+    throw new functions.https.HttpsError('invalid-argument', 'missing email');
+  }
+
   try {
-    await fetch('https://api.sendgrid.com/v3/mail/send', { 
+    const response = await fetch('https://api.sendgrid.com/v3/mail/send', { 
       method: 'POST',
       body: JSON.stringify({
         personalizations: [
@@ -29,12 +33,15 @@ export const emailSubscribe = functions.https.onCall(async (
       },
     });
 
-    return {
-      error: null,
-    };
+    if (response.status !== 202) {
+      throw new Error('failed to send email');
+    }
   } catch (error) {
-    console.log('Error', error.message);
-
-    throw new functions.https.HttpsError('failed-precondition', error.message);
+    console.error(error.message);
+    throw new functions.https.HttpsError('failed-precondition', 'failed to send email');
   }
+
+  return {
+    error: null,
+  };
 });
