@@ -1,13 +1,34 @@
 import * as functions from 'firebase-functions';
 import fetch from 'node-fetch';
+import * as fs from 'fs';
+
+type EmailData = {
+  [key:string]: any,
+};
+
+const emailData: EmailData = {
+  'raid': {
+    email: fs.readFileSync(`${__dirname}/emails/nether-news-raid-updates.html`, 'utf8'),
+    data: {},
+  },
+  'seven-sails': {
+    email: fs.readFileSync(`${__dirname}/emails/nether-news-raid-updates.html`, 'utf8'),
+    data: {},
+  },
+};
 
 export const emailSubscribe = functions.https.onCall(async (
   data: {
     email: string;
+    type: string;
   }
 ) => {
   if (!data.email) {
     throw new functions.https.HttpsError('invalid-argument', 'missing email');
+  }
+
+  if (!emailData[data.type]) {
+    throw new functions.https.HttpsError('invalid-argument', 'invalid email type');
   }
 
   try {
@@ -19,13 +40,21 @@ export const emailSubscribe = functions.https.onCall(async (
             to: [{
               email: data.email,
             }],
+            subject: 'Nether News - Raid Updates',
+            bcc: [{
+              email: 'brennen@nthrgames.com',
+            }],
+            substitutions: emailData[data.type].data,
           }
         ],
         from: {
           email: 'brennen@nthrgames.com',
           name: 'Brennen Peters',
         },
-        template_id: 'd-34ae597bb11045059f9a971641247410',
+        content: [{
+          type: 'text/html',
+          value: emailData[data.type].email,
+        }],
       }),
       headers: {
         'Content-Type': 'application/json',
