@@ -12,7 +12,7 @@ const emailData: EmailData = {
     data: {},
   },
   'seven-sails': {
-    email: fs.readFileSync(`${__dirname}/emails/nether-news-raid-updates.html`, 'utf8'),
+    email: fs.readFileSync(`${__dirname}/emails/nether-news-seven-sails-updates.html`, 'utf8'),
     data: {},
   },
 };

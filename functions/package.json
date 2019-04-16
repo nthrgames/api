@@ -2,7 +2,7 @@
   "name": "functions",
   "scripts": {
     "lint": "tslint --project tsconfig.json",
-    "build": "cp -R src/emails lib/emails && tsc",
+    "build": "rm -rf lib/emails && cp -R src/emails lib/emails && tsc",
     "serve": "yarn build && firebase serve --only functions",
     "shell": "yarn build && firebase functions:shell",
     "start": "yarn shell",
